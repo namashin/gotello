@@ -12,8 +12,11 @@ type ConfList struct {
 	Port    int
 }
 
+// Config 別パッケージからでも使えるように、頭文字を大文字に。
 var Config ConfList
 
+// init
+// main.go実行される前に設定ファイル読み込む
 func init() {
 	// config.iniファイルから設定情報読み込み
 	cfg, err := ini.Load("config.ini")

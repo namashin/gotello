@@ -1,6 +1,5 @@
 package main
 
-
 import (
 	"goTello/app/controllers"
 	"goTello/config"

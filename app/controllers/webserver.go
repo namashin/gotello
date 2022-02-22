@@ -20,7 +20,7 @@ func init() {
 	appContext.DroneManager = models.NewDroneManager()
 }
 
-// getTemplate connects base.html and other /html file
+// getTemplate connects base.html and other .html file
 func getTemplate(temp string) (*template.Template, error) {
 	return template.ParseFiles("app/views/base.html", temp)
 }
@@ -130,6 +130,12 @@ func apiCommandHandler(w http.ResponseWriter, r *http.Request) {
 		drone.StartPatrol()
 	case "stopPatrol":
 		drone.StopPatrol()
+	case "stopFaceDetectTrack":
+		drone.DisableFaceDetectTrackingOn()
+	case "faceDetectTrack":
+		drone.EnableFaceDetectTracking()
+	case "snapshot":
+		drone.TakeSnapShot()
 	default:
 		APIResponse(w, "Not found", http.StatusNotFound)
 		return
@@ -141,6 +147,7 @@ func StartWebServer() error {
 	http.HandleFunc("/", viewIndexHandler)
 	http.HandleFunc("/controller/", viewControllerHandler)
 	http.HandleFunc("/api/command/", apiMakeHandler(apiCommandHandler))
+	http.Handle("video/streaming", appContext.DroneManager.Stream)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	return http.ListenAndServe(fmt.Sprintf("%s:%d", config.Config.Address, config.Config.Port), nil)
 }
