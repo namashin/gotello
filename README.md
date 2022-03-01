@@ -1,11 +1,9 @@
 # gotello
 Control Tello EDU in web
 
-## Overview
+## NOTICE
 
-
-
-
+Make sure to connect yout laptop and Tello EDU Wifi.
 
 ## Requirement
 
