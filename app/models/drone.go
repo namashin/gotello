@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
+	"math/rand"
 	"os/exec"
 	"strconv"
 	"time"
@@ -58,6 +59,7 @@ func NewDroneManager() *DroneManager {
 
 	ffmpeg := exec.Command("ffmpeg", "-hwaccel", "auto", "-hwaccel_device", "opencl", "-i", "pipe:0", "-pix_fmt", "bgr24",
 		"-s", strconv.Itoa(frameX)+"x"+strconv.Itoa(frameY), "-f", "rawvideo", "pipe:1")
+
 	ffmpegIn, _ := ffmpeg.StdinPipe()
 	ffmpegOut, _ := ffmpeg.StdoutPipe()
 
@@ -135,6 +137,7 @@ func NewDroneManager() *DroneManager {
 // Patrol はgoroutineで走っているから、Patrolが実行中にまたよばれると、semaphoreとれない.
 // よって既にPatrol()呼ばれている場合はロック取れないので
 // isAcquire == false 入る。 その処理の中でパトロール中止命令
+//
 // 呼ばれていなかった場合、Patrol()開始。
 func (d *DroneManager) Patrol() {
 	go func() {
@@ -154,16 +157,16 @@ func (d *DroneManager) Patrol() {
 		defer d.patrolSem.Release(1)
 		d.isPatrolling = true
 
-		// status状態によってドローンの動き変えていく
-		status := 0
-
 		// 3秒毎にドローンの動きを変えていこうか。。
 		t := time.NewTicker(3 * time.Second)
 		for {
 			select {
 			case <-t.C:
 				d.Hover()
+				status := rand.Intn(6)
 				switch status {
+				case 0:
+					d.Up(d.Speed)
 				case 1:
 					d.Forward(d.Speed)
 				case 2:
@@ -173,14 +176,12 @@ func (d *DroneManager) Patrol() {
 				case 4:
 					d.Left(d.Speed)
 				case 5:
-					status = 0
+					d.RightFlip()
 				}
-				status++
 
 			case <-d.patrolQuit:
 				//既にPatrol()呼ばれている時に、再度Patrol()
 				//呼ばれたらここのcase入る
-
 				// tickerタイマーをストップ
 				t.Stop()
 				// そしてドローンを一時停止
@@ -195,12 +196,16 @@ func (d *DroneManager) Patrol() {
 func (d *DroneManager) StartPatrol() {
 	if !d.isPatrolling {
 		d.Patrol()
+	} else {
+		log.Println("Drone is patrolling now already!!!")
 	}
 }
 
 func (d *DroneManager) StopPatrol() {
 	if d.isPatrolling {
 		d.Patrol()
+	} else {
+		log.Println("Drone is already stopped!!!")
 	}
 }
 
@@ -215,7 +220,8 @@ func (d *DroneManager) StreamVideo() {
 			}
 		}()
 
-		if !classifier.Load(faceDetectXMLFile) {
+		ok := classifier.Load(faceDetectXMLFile)
+		if !ok {
 			log.Println("ERROR: classifier.Load(faceDetectXMLFile)")
 			return
 		}

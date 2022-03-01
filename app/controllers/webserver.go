@@ -57,11 +57,14 @@ func APIResponse(w http.ResponseWriter, result interface{}, code int) {
 	w.Write(js)
 }
 
-var apiValidPath = regexp.MustCompile("^/api/(command|shake|video)")
+// apiValidPath
+// urlを正規表現でバリデーションしている。
+var apiValidPath = regexp.MustCompile("^/api/(command|video)")
 
 // apiMakeHandler 上記apiValidPathのurlと一致しているか、validationするラップ関数
 func apiMakeHandler(fn func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// urlが正しいか検証した後、fn(w, r)返す
 		m := apiValidPath.FindStringSubmatch(r.URL.Path)
 		if len(m) == 0 {
 			APIResponse(w, "Not found", http.StatusNotFound)
