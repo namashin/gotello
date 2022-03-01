@@ -67,9 +67,16 @@ func apiMakeHandler(fn func(w http.ResponseWriter, r *http.Request)) http.Handle
 		// urlが正しいか検証した後、fn(w, r)返す
 		m := apiValidPath.FindStringSubmatch(r.URL.Path)
 		if len(m) == 0 {
-			APIResponse(w, "Not found", http.StatusNotFound)
-			return
+		    APIResponse(w, "Not found", http.StatusNotFound)
+		    return
 		}
+		
+		//if m == nil {
+		//    http.NotFound(w, r)
+		//    return
+		//}
+		
+		
 		fn(w, r)
 	}
 }
