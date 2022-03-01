@@ -23,6 +23,7 @@ const (
 	DefaultSpeed      = 10
 	WaitDroneStartSec = 5
 
+	// ドローンのフレーム
 	frameX       = 960 / 3
 	frameY       = 720 / 3
 	frameCenterX = frameX / 2
@@ -209,6 +210,8 @@ func (d *DroneManager) StopPatrol() {
 	}
 }
 
+// StreamVideo 参考URL
+// https://github.com/hybridgroup/gocv/blob/release/cmd/mjpeg-streamer/main.go
 func (d *DroneManager) StreamVideo() {
 	go func(d *DroneManager) {
 		classifier := gocv.NewCascadeClassifier()
@@ -301,6 +304,7 @@ func (d *DroneManager) StreamVideo() {
 						move = true
 					}
 
+					// ドローンカメラの枠内ならそのまま一時停止
 					if !move {
 						d.Hover()
 					}
