@@ -26,18 +26,28 @@ func getTemplate(temp string) (*template.Template, error) {
 }
 
 func viewIndexHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := getTemplate("app/views/index.html")
-	err := t.Execute(w, nil)
+	t, err := getTemplate("app/views/index.html")
+	
+	if err != nil{
+	    log.Println("Error when parsing a template: %s", err)
+	}
+	
+	err = t.Execute(w, nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func viewControllerHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := getTemplate("app/views/controller.html")
-	err := t.Execute(w, nil)
+	t, err := getTemplate("app/views/controller.html")
+	
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	    log.Println("Error when parsing a template: %s", err)
+	}
+	
+	err = t.Execute(w, nil)
+	if err != nil {
+	    http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -70,7 +80,8 @@ func apiMakeHandler(fn func(w http.ResponseWriter, r *http.Request)) http.Handle
 		    APIResponse(w, "Not found", http.StatusNotFound)
 		    return
 		}
-		
+	
+		// func(*Regexp) FindStringSubmatch の戻り値 nil は，マッチしないことを示します
 		//if m == nil {
 		//    http.NotFound(w, r)
 		//    return
