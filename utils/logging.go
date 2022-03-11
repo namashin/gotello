@@ -14,5 +14,7 @@ func LoggingSettings(logFile string) {
 	}
 	multiLogFile := io.MultiWriter(os.Stdout, logfile)
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+	
+	// 標準ロガーの出力先をmultiLogFilwに設定。
 	log.SetOutput(multiLogFile)
 }
