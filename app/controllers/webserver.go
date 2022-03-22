@@ -93,6 +93,9 @@ func apiMakeHandler(fn func(w http.ResponseWriter, r *http.Request)) http.Handle
 }
 
 func getSpeed(r *http.Request) int {
+	// r.ParseForm()
+	// r.Form["speed"]
+	
 	strSpeed := r.FormValue("speed")
 	if strSpeed == "" {
 		return models.DefaultSpeed
@@ -105,6 +108,9 @@ func getSpeed(r *http.Request) int {
 }
 
 func apiCommandHandler(w http.ResponseWriter, r *http.Request) {
+	// r.ParseForm()
+	// command := r.Form["command"]
+	
 	command := r.FormValue("command")
 	log.Printf("action=apiCommandHandler command=%s", command)
 	drone := appContext.DroneManager
