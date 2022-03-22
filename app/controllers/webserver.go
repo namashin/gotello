@@ -20,7 +20,7 @@ func init() {
 	appContext.DroneManager = models.NewDroneManager()
 }
 
-// getTemplate connects base.html and other .html file
+// getTemplate connects base.html and other ~~.html file
 func getTemplate(temp string) (*template.Template, error) {
 	return template.ParseFiles("app/views/base.html", temp)
 }
@@ -83,7 +83,7 @@ func apiMakeHandler(fn func(w http.ResponseWriter, r *http.Request)) http.Handle
 	
 		// func(*Regexp) FindStringSubmatch の戻り値 nil は，マッチしないことを示します
 		//if m == nil {
-		//    http.NotFound(w, r)
+		//    APIResponse(w, "Not found", http.StatusNotFound)
 		//    return
 		//}
 		
