@@ -25,7 +25,7 @@ func getTemplate(temp string) (*template.Template, error) {
 	return template.ParseFiles("app/views/base.html", temp)
 }
 
-func viewIndexHandler(w http.ResponseWriter, r *http.Request) {
+func viewIndexHandler(w http.ResponseWriter, req *http.Request) {
 	t, err := getTemplate("app/views/index.html")
 	
 	if err != nil{
@@ -38,7 +38,7 @@ func viewIndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func viewControllerHandler(w http.ResponseWriter, r *http.Request) {
+func viewControllerHandler(w http.ResponseWriter, req *http.Request) {
 	t, err := getTemplate("app/views/controller.html")
 	
 	if err != nil {
@@ -72,10 +72,10 @@ func APIResponse(w http.ResponseWriter, result interface{}, code int) {
 var apiValidPath = regexp.MustCompile("^/api/(command|video)")
 
 // apiMakeHandler 上記apiValidPathのurlと一致しているか、validationするラップ関数
-func apiMakeHandler(fn func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// urlが正しいか検証した後、fn(w, r)返す
-		m := apiValidPath.FindStringSubmatch(r.URL.Path)
+func apiMakeHandler(fn func(w http.ResponseWriter, req *http.Request)) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		// urlが正しいか検証した後、fn(w, req)返す
+		m := apiValidPath.FindStringSubmatch(req.URL.Path)
 		if len(m) == 0 {
 		    APIResponse(w, "Not found", http.StatusNotFound)
 		    return
@@ -88,15 +88,15 @@ func apiMakeHandler(fn func(w http.ResponseWriter, r *http.Request)) http.Handle
 		//}
 		
 		
-		fn(w, r)
+		fn(w, req)
 	}
 }
 
-func getSpeed(r *http.Request) int {
-	// r.ParseForm()
-	// r.Form["speed"]
+func getSpeed(req *http.Request) int {
+	// req.ParseForm()
+	// req.Form["speed"]
 	
-	strSpeed := r.FormValue("speed")
+	strSpeed := req.FormValue("speed")
 	if strSpeed == "" {
 		return models.DefaultSpeed
 	}
@@ -107,11 +107,11 @@ func getSpeed(r *http.Request) int {
 	return speed
 }
 
-func apiCommandHandler(w http.ResponseWriter, r *http.Request) {
-	// r.ParseForm()
-	// command := r.Form["command"]
+func apiCommandHandler(w http.ResponseWriter, req *http.Request) {
+	// req.ParseForm()
+	// command := req.Form["command"]
 	
-	command := r.FormValue("command")
+	command := req.FormValue("command")
 	log.Printf("action=apiCommandHandler command=%s", command)
 	drone := appContext.DroneManager
 	switch command {
